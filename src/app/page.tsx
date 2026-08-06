@@ -1,14 +1,31 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { performers } from '@/data/performers';
+import { useState, useMemo, useEffect } from 'react';
+import { Performer } from '@/types';
 import { PerformerCard } from '@/components/performers/PerformerCard';
 import { SearchFilter } from '@/components/performers/SearchFilter';
 
 export default function HomePage() {
+  const [performers, setPerformers] = useState<Performer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
+
+  useEffect(() => {
+    async function fetchPerformers() {
+      try {
+        const response = await fetch('/api/performers');
+        const data = await response.json();
+        setPerformers(data);
+      } catch (error) {
+        console.error('Failed to fetch performers:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPerformers();
+  }, []);
 
   const filteredPerformers = useMemo(() => {
     return performers.filter((performer) => {
@@ -24,7 +41,7 @@ export default function HomePage() {
 
       return matchesSearch && matchesCategory && matchesGenre;
     });
-  }, [searchTerm, selectedCategory, selectedGenre]);
+  }, [performers, searchTerm, selectedCategory, selectedGenre]);
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -54,11 +71,22 @@ export default function HomePage() {
 
         <div className="mb-6 flex items-center justify-between">
           <p className="text-sm font-medium text-slate-500">
-            Showing {filteredPerformers.length} performer{filteredPerformers.length !== 1 ? 's' : ''}
+            {isLoading
+              ? 'Loading performers…'
+              : `Showing ${filteredPerformers.length} performer${filteredPerformers.length !== 1 ? 's' : ''}`}
           </p>
         </div>
 
-        {filteredPerformers.length > 0 ? (
+        {isLoading ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[4/3] animate-pulse rounded-2xl border border-slate-200/80 bg-slate-100"
+              />
+            ))}
+          </div>
+        ) : filteredPerformers.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredPerformers.map((performer) => (
               <PerformerCard key={performer.id} performer={performer} />

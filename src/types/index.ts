@@ -1,4 +1,4 @@
-export type PerformerCategory = 'DJ' | 'Band' | 'Singer' | 'Musician' | 'Ensemble';
+export type PerformerCategory = 'DJ' | 'Band' | 'Singer' | 'Musician' | 'Ensemble' | 'Group';
 
 export type Genre =
     | 'House'

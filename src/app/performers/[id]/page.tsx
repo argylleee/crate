@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { performers } from '@/data/performers';
 import { BookingForm } from '@/components/performers/BookingForm';
 import type { Metadata } from 'next';
@@ -42,6 +43,12 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                     priority
                 />
                 <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent' />
+                <Link
+                    href='/'
+                    className='absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm backdrop-blur-sm transition-colors hover:bg-white sm:left-6 sm:top-6'
+                >
+                    <span aria-hidden>←</span> Back
+                </Link>
             </div>
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -54,7 +61,7 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                             className='object-cover'
                         />
                     </div>
-                    <div className='space-y-1'>
+                    <div className='space-y-1 rounded-2xl bg-white px-5 py-4 shadow-xl sm:self-end'>
                         <span className='inline-block rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200'>
                             {performer.category}
                         </span>
@@ -62,10 +69,10 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                             {performer.name}
                         </h1>
                         <p className='text-sm font-medium text-slate-600'>
-                            {performer.location} · <span className='text-amber-500'>★</span>
+                            {performer.location} · <span className='text-amber-500'>★ </span>
                             <span className='font-semibold text-slate-900'>
                                 {performer.rating}
-                            </span>
+                            </span> 
                             ({performer.reviewCount} reviews)
                         </p>
                     </div>
@@ -117,7 +124,7 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                                     >
                                         <p className="font-semibold text-slate-900">{tier.label}</p>
                                         <p className="text-sm text-slate-500">{tier.hours} hour{tier.hours !== 1 ? 's' : ''}</p>
-                                        <p className="mt-2 text-2xl font-extrabold text-amber-600">${tier.price}</p>
+                                        <p className="mt-2 text-2xl font-extrabold text-amber-600">₱{tier.price.toLocaleString('en-PH')}</p>
                                     </div>
                                 ))}
                             </div>
@@ -128,7 +135,7 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                             <div className="mb-6 border-b border-slate-100 pb-4">
                                 <h2 className="text-xl font-bold text-slate-900">Book {performer.name}</h2>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Starting at <span className="font-bold text-slate-900">${performer.startingPrice}</span> / hr
+                                    Starting at <span className="font-bold text-slate-900">₱{performer.startingPrice.toLocaleString('en-PH')}</span> / hr
                                 </p>
                             </div>
                             <BookingForm performerName={performer.name} />

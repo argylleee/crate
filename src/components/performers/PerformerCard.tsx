@@ -35,7 +35,7 @@ export function PerformerCard({ performer }: PerformerCardProps) {
                     </div>
                 </div>
                 <p className="mt-3 text-sm font-bold text-slate-900">
-                    From ${performer.startingPrice}
+                    From ₱{performer.startingPrice.toLocaleString('en-PH')}
                     <span className="font-normal text-slate-500"> / hr</span>
                 </p>
             </div>
