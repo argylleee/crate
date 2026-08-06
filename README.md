@@ -90,28 +90,22 @@ src/
 
 ## Technical Decisions & Trade-offs
 
-### Data layer: hybrid by design, not by accident
-The performer **listing and search** (`/` → `/api/performers`) reads from Postgres via Prisma — this is the path most representative of how the app would actually run in production. The performer **detail page** still reads from the static `data/performers.ts` file. This was a deliberate scope call, not an oversight: it let me prove out a real database, auth, and relational favorites end-to-end within the assessment's time box, without spending that same time re-plumbing every read path. The trade-off is explicit and small in surface area — the seed data's IDs are kept in sync with the mock file specifically so the two sources agree, and `Favorite`/`User`/`Booking` are fully relational regardless of where performer content is sourced from. Given more time, the next step is trivial: point the detail route and `/api/performers/[id]` at Prisma and drop the mock file entirely.
+**Data layer is hybrid, on purpose.** Home page search and listing read from Postgres via Prisma. The performer detail page still reads the static mock file. That's a scope call, not an oversight — I'd rather spend the time box proving out a real database, auth, and relational favorites than re-plumb a read path that already worked fine against mock data. Seed IDs match the mock file, so nothing breaks. Pointing the detail route at Prisma too is a small follow-up, not a rewrite.
 
-### Why Prisma + Supabase (optional enhancement)
-Supabase gives a managed Postgres instance with zero ops burden, which matters for a time-boxed assessment. Prisma on top gives migration history, generated types matched to the schema, and a query API that reads close to plain objects — cheaper to review than hand-written SQL, and the generated types catch schema drift at compile time rather than at runtime. The cost is the connection-pooling complexity Postgres-as-a-service introduces: Supabase's pooler (PgBouncer, transaction mode) doesn't support the session-level operations Prisma's migration engine needs, so the schema deliberately splits `DATABASE_URL` (pooled, used by the app at request time) from `DIRECT_URL` (unpooled, used only by the Prisma CLI for migrations).
+**Prisma + Supabase.** Supabase is a managed Postgres instance with no ops overhead, which matters on a deadline. Prisma adds migration history and generated types, so a schema change breaks the build instead of production. The one wrinkle: Supabase's pooled connection doesn't support the session-level ops Prisma's migration engine needs, so the app uses two URLs — `DATABASE_URL` (pooled, runtime queries) and `DIRECT_URL` (direct, migrations only).
 
-### Why Auth.js (NextAuth v5) over rolling my own
-Session handling, CSRF protection, and cookie security are exactly the kind of code where a subtle mistake is a real vulnerability, not a cosmetic bug. Auth.js's credentials provider plus the official Prisma adapter covers that surface without adding a hosted third-party auth vendor into a small assessment app. The trade-off is a dependency on a library still in v5 beta at the time of writing — acceptable here given the scope, but I'd re-evaluate before a production launch.
+**Auth.js over rolling my own.** Session and cookie handling is exactly where a small mistake becomes a real vulnerability, not a cosmetic bug. The credentials provider plus the official Prisma adapter covers that without pulling in a third-party auth vendor. It's still on a v5 beta release — fine for this scope, but I'd pin a stable version before shipping to real users.
 
-### Why the App Router over Pages Router
-Server Components by default meant less client-side JavaScript for pages that don't need interactivity (the performer detail page, for instance, does its favorite-status check server-side before render). `'use client'` is scoped to only the components that actually need state or browser APIs (search/filter, booking form, favorite button, session-aware nav).
+**App Router over Pages Router.** Server Components by default means less client JS on pages that don't need it — the performer detail page checks favorite status server-side, before any HTML reaches the browser. `'use client'` is scoped to only what actually needs state or browser APIs: search/filter, the booking form, the favorite button, the session-aware nav.
 
-### TypeScript
-Union string types instead of enums (zero runtime footprint, no separate object to keep in sync). One shared `types/index.ts` so the mock data, Prisma-sourced data, and component props all agree on shape — this is what caught the `Performer.genre` vs `Performer.genres` filtering bug during development (filtering against the singular primary genre instead of the full genre list).
+**TypeScript.** Union types over enums — no runtime cost, nothing extra to keep in sync. One shared `types/index.ts` keeps mock data, Prisma data, and component props all agreeing on shape. That's also what caught a real bug during development: genre filtering was checking the singular `genre` field instead of the full `genres` array.
 
-### Styling
-Tailwind CSS v4 utility classes; mobile-first breakpoints throughout (the navbar collapses to an animated hamburger menu below `sm:`). A tight two-color system — amber as the single accent, slate as the neutral scale — chosen so the UI reads as one deliberate system rather than a grab-bag of default Tailwind colors.
+**Styling.** Tailwind v4, mobile-first throughout. Two colors, deliberately — amber as the only accent, slate for everything else — so the UI reads as one system instead of a grab-bag of Tailwind defaults.
 
-### Known gaps (would address with more time)
-- Booking submissions are mocked (`console.log`, no persistence) even though a `Booking` Prisma model already exists — wiring the form to `POST /api/bookings` against that model is the natural next step.
-- No automated tests.
-- Production database migrations are manual (`prisma migrate deploy`, run locally against `DIRECT_URL`) rather than wired into the deploy pipeline — a deliberate choice to avoid running unreviewed schema changes automatically against production within this scope.
+### Known gaps
+- Bookings are mocked (logged, not saved) even though a `Booking` model already exists in the schema — the obvious next step.
+- No automated tests yet.
+- Production migrations are manual (`prisma migrate deploy` against `DIRECT_URL`), not wired into the deploy pipeline. Deliberate, so schema changes don't hit production unreviewed.
 
 ## Optional Enhancements Implemented
 
