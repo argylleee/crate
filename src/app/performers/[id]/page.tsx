@@ -3,6 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { performers } from '@/data/performers';
 import { BookingForm } from '@/components/performers/BookingForm';
+import { FavoriteButton } from '@/components/performers/FavoriteButton';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import type { Metadata } from 'next';
 
 interface PerformerPageProps {
@@ -32,6 +35,20 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
         notFound();
     }
 
+    const session = await auth();
+    let isFavorited = false;
+    if (session?.user?.id) {
+        const favorite = await prisma.favorite.findUnique({
+            where: {
+                userId_performerId: {
+                    userId: session.user.id,
+                    performerId: performer.id,
+                },
+            },
+        });
+        isFavorited = !!favorite;
+    }
+
     return (
         <div className='min-h-screen bg-slate-50/50'>
             <div className='relative h-64 sm:h-80 lg:h-96 bg-slate-900'>
@@ -49,6 +66,9 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                 >
                     <span aria-hidden>←</span> Back
                 </Link>
+                <div className='absolute right-4 top-4 sm:right-6 sm:top-6'>
+                    <FavoriteButton performerId={performer.id} initialFavorited={isFavorited} />
+                </div>
             </div>
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -72,7 +92,7 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                             {performer.location} · <span className='text-amber-500'>★ </span>
                             <span className='font-semibold text-slate-900'>
                                 {performer.rating}
-                            </span> 
+                            </span>{' '}
                             ({performer.reviewCount} reviews)
                         </p>
                     </div>
@@ -138,7 +158,7 @@ export default async function PerformerPage({ params }: PerformerPageProps) {
                                     Starting at <span className="font-bold text-slate-900">₱{performer.startingPrice.toLocaleString('en-PH')}</span> / hr
                                 </p>
                             </div>
-                            <BookingForm performerName={performer.name} />
+                            <BookingForm performerId={performer.id} performerName={performer.name} />
                         </div>
                     </div>
                 </div>

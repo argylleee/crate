@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Performer } from '@/types';
+import { FavoriteButton } from '@/components/performers/FavoriteButton';
 
 interface PerformerCardProps {
     performer: Performer;
+    isFavorited?: boolean;
+    onToggleFavorite?: (performerId: string, isFavorited: boolean) => void;
 }
 
-export function PerformerCard({ performer }: PerformerCardProps) {
+export function PerformerCard({ performer, isFavorited = false, onToggleFavorite }: PerformerCardProps) {
     return (
         <Link href={`/performers/${performer.id}`}
             className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60">
@@ -20,6 +23,13 @@ export function PerformerCard({ performer }: PerformerCardProps) {
                 />
                 <div className="absolute left-3 top-3 rounded-full bg-amber-500/90 px-3 py-1 text-xs font-semibold text-slate-950 shadow-sm backdrop-blur-sm">
                     {performer.category}
+                </div>
+                <div className="absolute right-3 top-3">
+                    <FavoriteButton
+                        performerId={performer.id}
+                        initialFavorited={isFavorited}
+                        onToggle={onToggleFavorite}
+                    />
                 </div>
             </div>
 
