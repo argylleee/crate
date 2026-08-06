@@ -27,57 +27,64 @@ export default function HomePage() {
   }, [searchTerm, selectedCategory, selectedGenre]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-          Find Your Perfect
-          <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            {' '}Entertainer
-          </span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-400">
-          Discover and book DJs, musicians, bands, and more for your next event.
-        </p>
-      </div>
-
-      <div className="mb-8">
-        <SearchFilter
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedGenre={selectedGenre}
-          onGenreChange={setSelectedGenre}
-        />
-      </div>
-
-      <p className="mb-6 text-sm text-gray-500">
-        {filteredPerformers.length} performer{filteredPerformers.length !== 1 ? 's' : ''} found
-      </p>
-
-      {filteredPerformers.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredPerformers.map((performer) => (
-            <PerformerCard key={performer.id} performer={performer} />
-          ))}
-        </div>
-      ) : (
-        <div className="py-20 text-center">
-          <p className="text-lg text-gray-500">
-            No performers found matching your criteria.
+    <div className="min-h-screen bg-slate-50/50">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+            Book Live Entertainment for{' '}
+            <span className="text-amber-600">
+              Your Next Event
+            </span>
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-base text-slate-600 sm:text-lg">
+            Discover and book DJs, musicians, bands, and more for your next event.
           </p>
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setSelectedCategory('');
-              setSelectedGenre('');
-            }}
-            className="mt-4 text-sm text-purple-400 hover:text-purple-300"
-          >
-            Clear all filters
-          </button>
         </div>
-      )}
+
+        <div className="mx-auto mb-10 max-w-4xl">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            selectedGenre={selectedGenre}
+            onGenreChange={setSelectedGenre}
+          />
+        </div>
+
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-sm font-medium text-slate-500">
+            Showing {filteredPerformers.length} performer{filteredPerformers.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {filteredPerformers.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredPerformers.map((performer) => (
+              <PerformerCard key={performer.id} performer={performer} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center">
+            <p className="text-lg font-medium text-slate-800">
+              No performers found matching your criteria.
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Try adjusting your search or clearing your filters.
+            </p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setSelectedGenre('');
+              }}
+              className="mt-4 inline-flex items-center text-sm font-bold text-amber-600 hover:text-amber-700"
+            >
+              Reset all filters
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

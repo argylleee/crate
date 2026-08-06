@@ -23,16 +23,16 @@ export function SearchFilter({
     onGenreChange,
 }: SearchFilterProps) {
     return (
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
             <div className="relative flex-1">
                 <input
                     type="text"
                     placeholder="Search performers..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-gray-900 px-4 py-3 pl-10 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                    className="w-full rounded-xl bg-transparent py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none focus:ring-2 focus:ring-amber-500/20"
                 />
-                <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+                <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -46,10 +46,12 @@ export function SearchFilter({
                 </svg>
             </div>
 
+            <div className="hidden h-8 w-px bg-slate-200 sm:block" />
+
             <select
                 value={selectedCategory}
                 onChange={(e) => onCategoryChange(e.target.value)}
-                className="rounded-xl border border-white/10 bg-gray-900 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-purple-500"
+                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
             >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
@@ -62,7 +64,7 @@ export function SearchFilter({
             <select
                 value={selectedGenre}
                 onChange={(e) => onGenreChange(e.target.value)}
-                className="rounded-xl border border-white/10 bg-gray-900 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-purple-500"
+                className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
             >
                 <option value="">All Genres</option>
                 {genres.map((g) => (
